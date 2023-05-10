@@ -5,8 +5,8 @@ import (
 )
 
 type TaskRepositoryInterface interface {
-	Create(task model.Task) (model.Task, error)
-	Update(task model.Task) (model.Task, error)
-	Delete(task model.Task) error
-	GetList(user string) ([]model.Task, error)
+	Create(task *model.Task) (*model.Task, error)
+	Update(task *model.Task) (*model.Task, error)
+	Delete(name, userName string) error
+	GetList(userName string) ([]*model.Task, error)
 }
