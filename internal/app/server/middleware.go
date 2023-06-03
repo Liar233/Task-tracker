@@ -2,25 +2,17 @@ package server
 
 import (
 	"context"
+	"io"
 	"net/http"
 )
 
-func NewProtocolMiddleware(next http.Handler) http.Handler {
+func ProtocolMiddleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 
 		var body []byte
 
-		n, err := request.Body.Read(body)
-
-		if err != nil || n == 0 {
-
-			RenderResponse(writer, ErrorResponse)
-
-			return
-		}
-
-		cmd, err := BuildCommand(body)
+		body, err := io.ReadAll(request.Body)
 
 		if err != nil {
 
@@ -29,7 +21,16 @@ func NewProtocolMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(request.Context(), "Cmd", cmd)
+		cmd, err := BuildRequestDto(body)
+
+		if err != nil {
+
+			RenderResponse(writer, ErrorResponse)
+
+			return
+		}
+
+		ctx := context.WithValue(request.Context(), "cmd", *cmd)
 
 		next.ServeHTTP(writer, request.WithContext(ctx))
 	})

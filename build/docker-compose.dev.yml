@@ -1,0 +1,21 @@
+version: "3.7"
+
+networks:
+  tracker-network:
+
+services:
+  tracker-dev-server:
+    image: tracker-dev-server
+    environment:
+      HTTP_HOST: "0.0.0.0"
+      HTTP_PORT: "8080"
+    container_name: tracker-dev-container
+    build:
+      context: ../
+      dockerfile: ./build/golang/Dockerfile.dev
+    ports:
+      - "8080:8080"
+    networks:
+      - tracker-network
+    volumes:
+      - ../:/app

@@ -37,7 +37,7 @@ var ThreeArgsCommands = []string{
 	ListTaskCmd,
 }
 
-func BuildCommand(query []byte) (*command.RequestDto, error) {
+func BuildRequestDto(query []byte) (*command.RequestDto, error) {
 
 	str := bytes.NewBuffer(query).String()
 
