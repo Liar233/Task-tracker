@@ -56,10 +56,12 @@ func (ea *ExecAction) buildResponse(
 
 		case storage.NotFountDBError,
 			storage.InvalidQueryDBError,
-			storage.AlreadyExistsDBError,
 			command.InvalidCommandError:
 
 			status = server.WrongFormatErrorResponse
+		default:
+
+			status = server.ErrorResponse
 		}
 
 		server.RenderResponse(writer, status)
