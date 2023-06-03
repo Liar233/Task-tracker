@@ -1,4 +1,4 @@
-package service
+package server
 
 import (
 	"context"
@@ -15,7 +15,7 @@ func NewProtocolMiddleware(next http.Handler) http.Handler {
 
 		if err != nil || n == 0 {
 
-			RenderResponse(writer, ERROR_RESPONSE)
+			RenderResponse(writer, ErrorResponse)
 
 			return
 		}
@@ -24,12 +24,12 @@ func NewProtocolMiddleware(next http.Handler) http.Handler {
 
 		if err != nil {
 
-			RenderResponse(writer, ERROR_RESPONSE)
+			RenderResponse(writer, ErrorResponse)
 
 			return
 		}
 
-		ctx := context.WithValue(request.Context(), "cmd", cmd)
+		ctx := context.WithValue(request.Context(), "Cmd", cmd)
 
 		next.ServeHTTP(writer, request.WithContext(ctx))
 	})

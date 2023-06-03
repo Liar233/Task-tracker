@@ -18,7 +18,7 @@ func TestTaskMemoryRepository_Create(t *testing.T) {
 
 	if t1, err := taskRep.Create(&task1); err != nil || t1 == nil {
 
-		t.Error("failed during creating task")
+		t.Error("failed creating task")
 	}
 
 	task2 := model.Task{
@@ -29,7 +29,7 @@ func TestTaskMemoryRepository_Create(t *testing.T) {
 
 	if t2, err := taskRep.Create(&task2); err != nil || t2 == nil {
 
-		t.Error("failed during creating task")
+		t.Error("failed creating task")
 	}
 
 	task3 := model.Task{
@@ -40,7 +40,7 @@ func TestTaskMemoryRepository_Create(t *testing.T) {
 
 	if t3, err := taskRep.Create(&task3); err == nil || t3 != nil {
 
-		t.Error("failed during creating existent task ")
+		t.Error("failed creating existent task")
 	}
 }
 
@@ -56,40 +56,27 @@ func TestTaskMemoryRepository_Update(t *testing.T) {
 
 	if t1, err := taskRep.Create(&task1); err != nil || t1 == nil {
 
-		t.Error("failed during creating task")
+		t.Error("failed creating task")
 	}
 
 	task2 := model.Task{
-		User:   "julia",
-		Name:   "task1",
-		Status: model.CREATED,
-	}
-
-	if t1, err := taskRep.Update(&task2); err == nil || t1 != nil {
-
-		println(err, t1)
-
-		t.Error("failed trying update task owned by another user")
-	}
-
-	task3 := model.Task{
 		User:   "vasya",
 		Name:   "task2",
 		Status: model.CREATED,
 	}
 
-	if t1, err := taskRep.Update(&task3); err == nil || t1 != nil {
+	if t1, err := taskRep.Update(&task2); err == nil || t1 != nil {
 
 		t.Error("failed trying update nonexistent task")
 	}
 
-	task4 := model.Task{
+	task3 := model.Task{
 		User:   "vasya",
 		Name:   "task1",
 		Status: model.CLOSED,
 	}
 
-	if t1, err := taskRep.Update(&task4); err != nil || t1 == nil {
+	if t1, err := taskRep.Update(&task3); err != nil || t1 == nil {
 
 		t.Error("failed trying update existent task")
 	}
@@ -112,38 +99,28 @@ func TestTaskMemoryRepository_Delete(t *testing.T) {
 
 	if t1, err := taskRep.Create(&task1); err != nil || t1 == nil {
 
-		t.Error("failed during creating task")
+		t.Error("failed creating task")
 	}
 
 	task2 := model.Task{
 		User:   "vasya",
 		Name:   "task2",
-		Status: model.CREATED,
+		Status: model.CLOSED,
 	}
 
 	if t2, err := taskRep.Create(&task2); err != nil || t2 == nil {
 
-		t.Error("failed during creating task")
+		t.Error("failed creating task")
 	}
 
-	if err := taskRep.Delete("task1", "julia"); err == nil {
+	if err := taskRep.Delete("task1"); err == nil {
 
-		t.Error("failed during deleting tasks by another user")
+		t.Error("failed trying delete not closed task")
 	}
 
-	if err := taskRep.Delete("task3", "vasya"); err == nil {
+	if err := taskRep.Delete("task2"); err != nil {
 
-		t.Error("failed during deleting nonexistent task")
-	}
-
-	if err := taskRep.Delete("task1", "vasya"); err != nil {
-
-		t.Error("failed during deleting existent task")
-	}
-
-	if task, ok := taskRep.tasks.Load("task1"); ok || task != nil {
-
-		t.Error("failed during deleting existent task")
+		t.Error("failed trying delete closed task")
 	}
 }
 
@@ -159,7 +136,7 @@ func TestTaskMemoryRepository_GetList(t *testing.T) {
 
 	if t1, err := taskRep.Create(&task1); err != nil || t1 == nil {
 
-		t.Error("failed during creating task")
+		t.Error("failed creating task")
 	}
 
 	task2 := model.Task{
@@ -170,7 +147,7 @@ func TestTaskMemoryRepository_GetList(t *testing.T) {
 
 	if t2, err := taskRep.Create(&task2); err != nil || t2 == nil {
 
-		t.Error("failed during creating task")
+		t.Error("failed creating task")
 	}
 
 	task3 := model.Task{
@@ -181,7 +158,7 @@ func TestTaskMemoryRepository_GetList(t *testing.T) {
 
 	if t3, err := taskRep.Create(&task3); err != nil || t3 == nil {
 
-		t.Error("failed during creating task")
+		t.Error("failed creating task")
 	}
 
 	tList, err := taskRep.GetList("vasya")

@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/Liar233/Task-tracker/internal/app/model"
@@ -11,11 +10,23 @@ type TaskMemoryRepository struct {
 	tasks *sync.Map
 }
 
+func (tmr *TaskMemoryRepository) Get(name string) (*model.Task, error) {
+
+	task, ok := tmr.tasks.Load(name)
+
+	if !ok {
+
+		return nil, NotFountDBError
+	}
+
+	return task.(*model.Task), nil
+}
+
 func (tmr *TaskMemoryRepository) Create(task *model.Task) (*model.Task, error) {
 
 	if _, ok := tmr.tasks.Load(task.Name); ok {
 
-		return nil, fmt.Errorf("task %s already exists", task.Name)
+		return nil, AlreadyExistsDBError
 	}
 
 	tmr.tasks.Store(task.Name, task)
@@ -25,16 +36,11 @@ func (tmr *TaskMemoryRepository) Create(task *model.Task) (*model.Task, error) {
 
 func (tmr *TaskMemoryRepository) Update(task *model.Task) (*model.Task, error) {
 
-	old, ok := tmr.tasks.Load(task.Name)
+	_, ok := tmr.tasks.Load(task.Name)
 
 	if !ok {
 
-		return nil, fmt.Errorf("there is no task %s", task.Name)
-	}
-
-	if old.(*model.Task).User != task.User {
-
-		return nil, fmt.Errorf("task %s not available for user %s", task.Name, task.User)
+		return nil, NotFountDBError
 	}
 
 	tmr.tasks.Store(task.Name, task)
@@ -42,21 +48,37 @@ func (tmr *TaskMemoryRepository) Update(task *model.Task) (*model.Task, error) {
 	return task, nil
 }
 
-func (tmr *TaskMemoryRepository) Delete(name, userName string) error {
+func (tmr *TaskMemoryRepository) Delete(name string) error {
 
 	val, ok := tmr.tasks.Load(name)
 
 	if !ok {
 
-		return fmt.Errorf("there is no task %s", name)
+		return NotFountDBError
 	}
 
-	if val.(*model.Task).User != userName {
+	task := val.(*model.Task)
 
-		return fmt.Errorf("task %s not available for user %s", name, userName)
+	if task.Status != model.CLOSED {
+
+		return InvalidQueryDBError
 	}
+
+	task.Status = model.DELETED
 
 	tmr.tasks.Delete(name)
+
+	return nil
+}
+
+func (tmr *TaskMemoryRepository) DeleteAll() error {
+
+	tmr.tasks.Range(func(key interface{}, value interface{}) bool {
+
+		tmr.tasks.Delete(key)
+
+		return true
+	})
 
 	return nil
 }
@@ -69,7 +91,7 @@ func (tmr *TaskMemoryRepository) GetList(userName string) ([]*model.Task, error)
 
 		buf := value.(*model.Task)
 
-		if buf.User == userName {
+		if buf.User == userName && buf.Status != model.DELETED {
 
 			res = append(res, buf)
 		}

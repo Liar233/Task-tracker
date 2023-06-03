@@ -1,4 +1,4 @@
-package service
+package server
 
 import (
 	"testing"
@@ -46,14 +46,14 @@ func TestBuildCommand(t *testing.T) {
 		t.Errorf("fail to build %s query", query6)
 	}
 
-	if cmd6.user != "vasya" || cmd6.cmd != DELETE_ALL_COMMAND {
+	if cmd6.User != "vasya" || cmd6.Cmd != DeleteAllCmd {
 
 		t.Errorf("fail to build %s query", query6)
 	}
 
 	cmd7, err := BuildCommand(query7)
 
-	if cmd7.user != "vasya" || cmd7.cmd != CREATE_TASK_COMMAND || cmd7.arg != "task1" {
+	if cmd7.User != "vasya" || cmd7.Cmd != CreateTaskCmd || cmd7.Arg != "task1" {
 
 		t.Errorf("fail to build %s query", query7)
 	}
