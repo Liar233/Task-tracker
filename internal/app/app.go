@@ -20,9 +20,7 @@ type App struct {
 
 func (app *App) Bootstrap() {
 
-	app.taskRep = storage.NewTaskMemoryRepository()
-
-	app.server = server.NewHttpServerAdapter(app.config.Host, app.config.Port)
+	app.server = server.NewHttpServerAdapter(app.config.HttpHost, app.config.HttpPort)
 
 	router := mux.NewRouter()
 
@@ -34,17 +32,30 @@ func (app *App) Bootstrap() {
 
 func (app *App) Run() (exitErr error) {
 
+	var err error
+
+	app.taskRep, err = storage.NewTaskPostgresRepository(
+		app.config.DBHost,
+		app.config.DBName,
+		app.config.DBUser,
+		app.config.DBPassword,
+		app.config.DBPort,
+	)
+
+	if err != nil {
+
+		return err
+	}
+
 	go func() {
-		if err := app.server.ListenAndServe(); err != nil {
+
+		if err = app.server.ListenAndServe(); err != nil {
 
 			exitErr = err
 
 			return
 		}
-
 	}()
-
-	println("Server started")
 
 	return app.Stop()
 }
@@ -61,7 +72,7 @@ func (app *App) Stop() error {
 
 	app.server.Close()
 
-	return nil
+	return app.taskRep.Close()
 }
 
 func NewApp(config *ApplicationConfig) *App {

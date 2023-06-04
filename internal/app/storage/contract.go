@@ -19,4 +19,5 @@ type TaskRepositoryInterface interface {
 	Delete(name string) error
 	DeleteAll() error
 	GetList(userName string) ([]*model.Task, error)
+	Close() error
 }

@@ -1,6 +1,11 @@
 package app
 
 type ApplicationConfig struct {
-	Host string
-	Port uint64
+	HttpHost   string
+	HttpPort   uint64
+	DBHost     string
+	DBPort     uint64
+	DBName     string
+	DBUser     string
+	DBPassword string
 }

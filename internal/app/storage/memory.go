@@ -102,6 +102,11 @@ func (tmr *TaskMemoryRepository) GetList(userName string) ([]*model.Task, error)
 	return res, nil
 }
 
+func (tmr *TaskMemoryRepository) Close() error {
+
+	return nil
+}
+
 func NewTaskMemoryRepository() *TaskMemoryRepository {
 
 	return &TaskMemoryRepository{

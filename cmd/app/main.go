@@ -1,11 +1,10 @@
 package main
 
 import (
-	"errors"
 	"os"
-	"strconv"
 
 	"github.com/Liar233/Task-tracker/internal/app"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -24,7 +23,7 @@ func main() {
 
 	tasksApp.Bootstrap()
 
-	if err := tasksApp.Run(); err != nil {
+	if err = tasksApp.Run(); err != nil {
 
 		println(err.Error())
 
@@ -34,34 +33,19 @@ func main() {
 
 func loadConfig() (*app.ApplicationConfig, error) {
 
-	envHost, ok := os.LookupEnv("HTTP_HOST")
+	vp := viper.New()
+	vp.AutomaticEnv()
 
-	if !ok {
+	config := &app.ApplicationConfig{}
 
-		return nil, errors.New("variable HTTP_HOST does not exists")
-	}
+	config.HttpPort = vp.GetUint64("HTTP_PORT")
+	config.HttpHost = vp.GetString("HTTP_HOST")
 
-	if envHost == "" {
+	config.DBPort = vp.GetUint64("DB_PORT")
+	config.DBHost = vp.GetString("DB_HOST")
+	config.DBName = vp.GetString("DB_NAME")
+	config.DBUser = vp.GetString("DB_USER")
+	config.DBPassword = vp.GetString("DB_PASSWORD")
 
-		return nil, errors.New("variable HTTP_HOST not valid")
-	}
-
-	envPort, ok := os.LookupEnv("HTTP_PORT")
-
-	if !ok {
-
-		return nil, errors.New("variable HTTP_PORT does not exists")
-	}
-
-	port, err := strconv.ParseUint(envPort, 10, 64)
-
-	if err != nil || port == uint64(0) {
-
-		return nil, errors.New("variable HTTP_PORT does not valid")
-	}
-
-	return &app.ApplicationConfig{
-		Host: envHost,
-		Port: port,
-	}, err
+	return config, nil
 }
