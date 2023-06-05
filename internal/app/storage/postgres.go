@@ -10,7 +10,8 @@ import (
 )
 
 type TaskPostgresRepository struct {
-	db *sql.DB
+	db  *sql.DB
+	dsn string
 }
 
 func (tpr *TaskPostgresRepository) Get(name string) (*model.Task, error) {
@@ -195,23 +196,35 @@ func (tpr *TaskPostgresRepository) GetList(userName string) ([]*model.Task, erro
 	return tasks, nil
 }
 
-func (tpr *TaskPostgresRepository) Close() error {
+func (tpr *TaskPostgresRepository) Open() error {
 
-	return tpr.db.Close()
-}
-
-func NewTaskPostgresRepository(host, dbname, username, password string, port uint64) (*TaskPostgresRepository, error) {
-
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", username, password, host, port, dbname)
-
-	db, err := sql.Open("postgres", dsn)
+	db, err := sql.Open("postgres", tpr.dsn)
 
 	if err != nil {
 
-		return nil, err
+		return err
 	}
 
+	tpr.db = db
+
+	return nil
+}
+
+func (tpr *TaskPostgresRepository) Close() error {
+
+	if tpr.db != nil {
+
+		return tpr.db.Close()
+	}
+
+	return fmt.Errorf("database connection was not established")
+}
+
+func NewTaskPostgresRepository(host, dbname, username, password string, port uint64) *TaskPostgresRepository {
+
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", username, password, host, port, dbname)
+
 	return &TaskPostgresRepository{
-		db: db,
-	}, nil
+		dsn: dsn,
+	}
 }

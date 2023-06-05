@@ -17,7 +17,7 @@ services:
       DB_PASSWORD: "secret"
       DB_HOST: "tracker-postgresql"
       DB_NAME: "tracker_db"
-      DB_PORT: "5432"
+      DB_PORT: 5432
     ports:
       - "8080:8080"
     networks:

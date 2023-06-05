@@ -32,9 +32,9 @@ func TestGetListCommand_Exec(t *testing.T) {
 	cmd := NewGetListCommand(testTaskRep)
 
 	reqDto := RequestDto{
-		User: "user1",
+		User: "user2",
 		Cmd:  ListTaskCmd,
-		Arg:  "",
+		Arg:  "user1",
 	}
 
 	if resDto := cmd.Exec(reqDto); resDto.Error() != nil || len(resDto.Data()) != 3 {

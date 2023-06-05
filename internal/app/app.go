@@ -20,6 +20,14 @@ type App struct {
 
 func (app *App) Bootstrap() {
 
+	app.taskRep = storage.NewTaskPostgresRepository(
+		app.config.DBHost,
+		app.config.DBName,
+		app.config.DBUser,
+		app.config.DBPassword,
+		app.config.DBPort,
+	)
+
 	app.server = server.NewHttpServerAdapter(app.config.HttpHost, app.config.HttpPort)
 
 	router := mux.NewRouter()
@@ -34,15 +42,7 @@ func (app *App) Run() (exitErr error) {
 
 	var err error
 
-	app.taskRep, err = storage.NewTaskPostgresRepository(
-		app.config.DBHost,
-		app.config.DBName,
-		app.config.DBUser,
-		app.config.DBPassword,
-		app.config.DBPort,
-	)
-
-	if err != nil {
+	if err = app.taskRep.Open(); err != nil {
 
 		return err
 	}

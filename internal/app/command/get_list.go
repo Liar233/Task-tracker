@@ -10,7 +10,7 @@ func (glc *GetListCommand) Exec(dto RequestDto) ResultDtoInterface {
 
 	resDto := &ResultListDto{}
 
-	tasksList, err := glc.taskRep.GetList(dto.User)
+	tasksList, err := glc.taskRep.GetList(dto.Arg)
 
 	if err != nil {
 

@@ -8,13 +8,15 @@ import (
 
 func TestTaskPostgresRepository(t *testing.T) {
 
-	taskRep, err := NewTaskPostgresRepository(
+	taskRep := NewTaskPostgresRepository(
 		"tracker-postgresql",
 		"tracker_db",
 		"tracker",
 		"secret",
 		5432,
 	)
+
+	err := taskRep.Open()
 
 	if err != nil {
 
@@ -60,19 +62,19 @@ func TestTaskPostgresRepository(t *testing.T) {
 		t.Logf("failed creating existent task: %+v\n", taskEx)
 	}
 
-	//task.Status = model.CLOSED
-	//
-	//if task, err = taskRep.Update(task); err != nil {
-	//
-	//	t.Logf("failed updating existent task with: %+v\n", err)
-	//}
-	//
-	//task.Name = "task2"
-	//
-	//if taskUp, err := taskRep.Update(task); err == nil {
-	//
-	//	t.Errorf("failed updating non-existent task %+v\n", taskUp)
-	//}
+	task.Status = model.CLOSED
+
+	if task, err = taskRep.Update(task); err != nil {
+
+		t.Logf("failed updating existent task with: %+v\n", err)
+	}
+
+	task.Name = "task2"
+
+	if taskUp, err := taskRep.Update(task); err == nil {
+
+		t.Errorf("failed updating non-existent task %+v\n", taskUp)
+	}
 
 	tasks, err := taskRep.GetList("user1")
 
